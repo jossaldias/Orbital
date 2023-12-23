@@ -1,0 +1,12 @@
+<!-- satellite-info.component.html -->
+<label for="satelliteSelector">Selecciona un satélite:</label>
+<select id="satelliteSelector" [(ngModel)]="selectedSatellite">
+  <option value="SSOT">SSOT</option>
+  <option value="EROS C3">EROS C3</option>
+  <option value="EROS B">EROS B</option>  
+  <option value="PERUSAT 1">PERUSAT 1</option>   
+                      
+  <!-- Otras opciones de satélites -->
+</select>
+<button (click)="getSatelliteInfo()">Obtener TLE</button>
+<div id="tleInfo">{{ satelliteInfo }}</div>

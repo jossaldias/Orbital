@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
-import { SatelliteCalculationService } from '../satellite-calculation-service.service';
+import { SatelliteCalculationService } from '../../services/satellite-calculation-service.service';
 import { Subscription } from 'rxjs';
 import mapboxgl from 'mapbox-gl';
 
@@ -20,18 +20,24 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
   satelliteCoordinates: SatelliteCoordinates | undefined;
   satelliteSubscription: Subscription | undefined;
   mapInitialized = false;
+  satelliteName: string | undefined;
 
-  constructor(private satelliteService: SatelliteCalculationService) {
+  constructor(private satelliteService: SatelliteCalculationService) {}
+
+  ngOnInit() {
     this.satelliteSubscription = this.satelliteService.coordinates$.subscribe(
       (coordinates: SatelliteCoordinates) => {
         this.satelliteCoordinates = coordinates;
         this.updateMarkerPosition();
       }
     );
-  }
 
-  ngOnInit() {
-    // No inicialices el mapa aquí, deja que Angular complete la vista primero
+    this.satelliteService.satelliteName$.subscribe((name: string) => {
+      this.satelliteName = name;
+      if (this.mapInitialized) {
+        this.addOrUpdateMarker();
+      }
+    });
   }
 
   ngOnDestroy() {
@@ -69,47 +75,44 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-updateMarkerPosition() {
-  if (this.mapInitialized && this.map && this.satelliteCoordinates) {
-    this.addOrUpdateMarker();
-    const { latitude, longitude } = this.satelliteCoordinates;
-    this.map.flyTo({
-      center: [longitude, latitude],
-      essential: true // Asegura una transición suave
-    });
+  updateMarkerPosition() {
+    if (this.mapInitialized && this.map && this.satelliteCoordinates) {
+      this.addOrUpdateMarker();
+      const { latitude, longitude } = this.satelliteCoordinates;
+      this.map.flyTo({
+        center: [longitude, latitude],
+        essential: true // Asegura una transición suave
+      });
+      this.addOrUpdateMarker(); 
+    }
   }
-}
-
 
   addOrUpdateMarker() {
-    if (!this.map || !this.satelliteCoordinates) {
+    if (!this.map || !this.satelliteCoordinates || !this.satelliteName) {
       return;
     }
 
     const { latitude, longitude } = this.satelliteCoordinates;
 
-    // Cambiar el ícono del marcador
     const el = document.createElement('div');
     el.className = 'custom-marker';
     el.style.backgroundImage = 'url(\'../../assets/img/fasat.png\')';
     el.style.width = '200px';
     el.style.height = '200px';
     el.style.backgroundSize = 'contain';
-    el.style.backgroundPosition = 'center center'; 
-    el.style.backgroundRepeat = 'no-repeat'; 
-
-
+    el.style.backgroundPosition = 'center center';
+    el.style.backgroundRepeat = 'no-repeat';
     el.style.cursor = 'pointer';
 
     if (!this.marker) {
       this.marker = new mapboxgl.Marker(el).setLngLat([longitude, latitude]).addTo(this.map);
 
-      // Agregar leyenda
       const legend = document.createElement('div');
-      legend.innerHTML = 'SSOT';
+      legend.id = 'satelliteNameLabel';
+      legend.innerHTML = this.satelliteName;
       legend.style.color = '#ffffff';
       legend.style.fontSize = '20px';
-      legend.style.textAlign = 'center'
+      legend.style.textAlign = 'center';
       legend.style.backgroundColor = '#000000';
       legend.style.padding = '5px';
       legend.style.borderRadius = '5px';
@@ -117,6 +120,10 @@ updateMarkerPosition() {
       this.marker.getElement().appendChild(legend);
     } else {
       this.marker.setLngLat([longitude, latitude]);
+        const labelElement = this.marker.getElement().querySelector('#satelliteNameLabel');
+              if (labelElement) {
+                labelElement.innerHTML = this.satelliteName;
+              }
     }
   }
 }
