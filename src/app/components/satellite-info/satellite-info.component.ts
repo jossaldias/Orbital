@@ -22,7 +22,7 @@ export class SatelliteInfoComponent {
     }
 
     try {
-      const response = await this.http.get(`http://localhost:3000/satellite/${this.selectedSatellite}`, { responseType: 'text' }).toPromise();
+      const response = await this.http.get(`https://us-central1-orbital-trackr.cloudfunctions.net/app/satellite/${this.selectedSatellite}`, { responseType: 'text' }).toPromise();
       if (response !== undefined) {
         //console.log('Response from server:', response);
         this.satelliteInfo = response;
