@@ -9,11 +9,13 @@ import { Subject } from 'rxjs';
 export class SatelliteCalculationService {
   private coordinatesSubject: Subject<any> = new Subject<any>();
   private satelliteNameSubject: Subject<string> = new Subject<string>();
+  private satelliteJsonSubject: Subject<any> = new Subject<any>();
   private intervalId: any;
 
-  private tleLine1: string = '1 38011U 11076E   23354.79367538  .00002248  00000+0  28953-3 0  9998';
-  private tleLine2: string = '2 38011  97.7290  55.4537 0001608  87.9070   6.9436 14.82018237649692';
+  private tleLine1: string = '1 41866U 16071A   23359.22757810 -.00000237  00000+0  00000+0 0  9995';
+  private tleLine2: string = '2 41866   0.0654 247.0651 0001352  56.0167 157.1108  1.00271540 26037';
   private satelliteName: string = 'Unnamed Satellite'; // Nombre predeterminado
+  private satelliteJson: any = '';
 
   constructor() {
     // Iniciar la actualización de coordenadas y nombre del satélite
@@ -27,6 +29,8 @@ export class SatelliteCalculationService {
   get satelliteName$() {
     return this.satelliteNameSubject.asObservable();
   }
+  get satelliteJson$(){
+    return this.satelliteJsonSubject.asObservable()};
 
   private updateSatelliteData() {
     this.intervalId = setInterval(() => {
@@ -65,9 +69,19 @@ export class SatelliteCalculationService {
     this.updateSatelliteName(satelliteName);
   }
 
-updateSatelliteName(satelliteName: string) {
-  this.satelliteName = satelliteName;
-  console.log('Nuevo nombre del satélite:', this.satelliteName); // Agregar este registro para verificar
-  this.satelliteNameSubject.next(this.satelliteName);
-}
+  updateSatelliteName(satelliteName: string) {
+    this.satelliteName = satelliteName;
+    console.log('Nuevo nombre del satélite:', this.satelliteName); // Agregar este registro para verificar
+    this.satelliteNameSubject.next(this.satelliteName);
+  }
+
+  updateJson(satelliteJson: any) {
+    console.log('Nuevo JSON del satélite:', satelliteJson);
+    this.satelliteJson = satelliteJson;
+    this.satelliteJsonSubject.next(this.satelliteJson);
+    // Imprimir el JSON en la consola del navegador
+    console.log('Satellite JSON:', this.satelliteJson);
+  }
+
+
 }
