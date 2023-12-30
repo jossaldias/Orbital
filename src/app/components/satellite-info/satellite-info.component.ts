@@ -25,6 +25,7 @@ export class SatelliteInfoComponent {
   try {
     const satelliteInfoResponse = await this.http.get(`https://us-central1-orbital-trackr.cloudfunctions.net/app/satellite/${this.selectedSatellite}`, { responseType: 'text' }).toPromise();
 
+
     if (satelliteInfoResponse !== undefined) {
       this.satelliteInfo = satelliteInfoResponse;
       const lines = satelliteInfoResponse.split(/\r?\n/).filter(line => line.trim().length > 0);

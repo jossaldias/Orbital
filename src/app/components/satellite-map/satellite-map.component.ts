@@ -30,6 +30,7 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
       (coordinates: SatelliteCoordinates) => {
         this.satelliteCoordinates = coordinates;
         this.updateMarkerPosition();
+        this.initializeMap();
       }
     );
 
@@ -68,12 +69,15 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
           if (this.satelliteCoordinates && !this.map) {
             this.map = new mapboxgl.Map({
               container: 'map',
-              style: 'mapbox://styles/mapbox/dark-v11',
+              style: 'mapbox://styles/shiza1991/clqrjzve800ld01pd59dg9y7s',
               center: [coordinates.longitude, coordinates.latitude],
-              zoom: 5
+              zoom: 1
             });
+            this.map.addControl(new mapboxgl.NavigationControl());
 
             this.map.on('load', () => {
+
+              //this.addRadarLayer();
               this.mapInitialized = true;
               this.addOrUpdateMarker();
             });
@@ -83,14 +87,19 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
-  updateMarkerPosition() {
-    if (this.mapInitialized && this.map && this.satelliteCoordinates) {
-      this.addOrUpdateMarker();
+flyToSatellite() {
+    if (this.satelliteCoordinates && this.map) {
       const { latitude, longitude } = this.satelliteCoordinates;
       this.map.flyTo({
         center: [longitude, latitude],
-        essential: true,
+        zoom: 1, // Puedes ajustar el nivel de zoom según sea necesario
+        essential: true // Esta animación se considera esencial con respecto a prefers-reduced-motion
       });
+    }
+  }
+
+  updateMarkerPosition() {
+    if (this.mapInitialized && this.map && this.satelliteCoordinates) {
       this.addOrUpdateMarker();
     }
   }
@@ -132,7 +141,7 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
       this.marker.getElement().appendChild(legend);
 
 
-      const popup = new mapboxgl.Popup().setHTML(`
+      const popup = new mapboxgl.Popup({ closeButton: false }).setHTML(`
 
         <h6>${this.satelliteJson.OBJECT_NAME}</h6>  
         <table>
@@ -200,13 +209,13 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
             <td><strong>MEAN_MOTION_DDOT:</strong></td>
             <td><pre>${this.satelliteJson.MEAN_MOTION_DDOT}</pre></td>
         </tr>
-    </table>
+        </table>
         `);
       this.marker.setPopup(popup);
 
       this.marker.getElement().addEventListener('click', () => {
-        if (this.marker) {
-          this.marker.togglePopup();
+        if (this.marker?.getPopup) {
+          this.marker.getPopup().remove();
         }
       });
     } else {
@@ -283,16 +292,58 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
             <td><strong>MEAN_MOTION_DDOT:</strong></td>
             <td><pre>${this.satelliteJson.MEAN_MOTION_DDOT}</pre></td>
         </tr>
-    </table>`;
+        </table>`;
 
       const existingPopup = this.marker.getPopup();
       if (existingPopup) {
         existingPopup.setHTML(popupContent);
       }
-
-
     }
   }
+
+// addRadarLayer = () => {
+//       const twcApiKey = '198629cb355145e68629cb3551d5e670';
+
+//       // set up a promise for The Weather Company product metadata
+//       const timeSlices = fetch(
+//         'https://api.weather.com/v3/TileServer/series/productSet/PPAcore?apiKey=' +
+//           twcApiKey
+//       );
+
+//         timeSlices
+//           .then((res) => res.json())
+//           .then((res) => {
+//             const radarTimeSlices = res.seriesInfo.radar.series;
+//             const latestTimeSlice = radarTimeSlices[0].ts;
+
+//             // insert the latest time for radar into the source data URL
+//             this.map?.addSource('twcRadar', {
+//               type: 'raster',
+//               tiles: [
+//                 'https://api.weather.com/v3/TileServer/tile/radar?ts=' +
+//                   latestTimeSlice +
+//                   '&xyz={x}:{y}:{z}&apiKey=' +
+//                   twcApiKey,
+//               ],
+//               tileSize: 256,
+//             });
+
+          
+//             this.map?.addLayer(
+//               {
+//                 id: 'radar',
+//                 type: 'raster',
+//                 source: 'twcRadar',
+//                 paint: {
+//                   'raster-opacity': 0.5,
+//                 },
+//               },
+//               'aeroway-line'
+//             );
+//           });
+//       };
+
+
 }
 
 

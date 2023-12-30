@@ -1,9 +1,8 @@
-<select id="satelliteSelector" [(ngModel)]="selectedSatellite" >
-  <option value="" disabled selected hidden>Selecciona un satélite</option>
-  <option value="SSOT">SSOT</option>
-  <option value="EROS C3">EROS C3</option>
-  <option value="EROS B">EROS B</option>  
-
-</select>
-<button (click)="getSatelliteInfo()">Obtener TLE</button>
-<div id="tleInfo">{{ satelliteInfo }}</div>
+<mat-form-field>
+  <mat-label>Seleccionar Satélite</mat-label>
+  <mat-select id="satelliteSelector" [(ngModel)]="selectedSatellite" (selectionChange)="getSatelliteInfo()">
+    <mat-option value="SSOT">SSOT</mat-option>
+    <mat-option value="EROS C3">EROS C3</mat-option>
+    <mat-option value="EROS B">EROS B</mat-option>
+  </mat-select>
+</mat-form-field>
