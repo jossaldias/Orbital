@@ -14,8 +14,10 @@
 }
 
 .fly-button {
-  flex: 1 1 auto; /* Cambiado de 30% a auto para adaptarse al contenido */
-  max-width: 200px; /* Establecer un ancho máximo */
+  color: #c3c5c3 !important;
+  background-color: #05014d;
+  flex: 1 1 auto; 
+  max-width: 200px;
   height: 50px;
 }
 
@@ -45,13 +47,5 @@ app-satellite-info {
   .flex-container {
     flex-direction: column; 
     align-items: center;
-  }
-
-  app-satellite-info,
-  .fly-button {
-    flex: 1 1 auto; 
-    min-width: 55%;
-    max-width: 45%;
-
   }
 }
