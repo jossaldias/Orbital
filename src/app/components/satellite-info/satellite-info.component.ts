@@ -7,22 +7,19 @@ import { SatelliteCalculationService } from 'src/app/services/satellite-calculat
   templateUrl: './satellite-info.component.html',
   styleUrls: ['./satellite-info.component.css']
 })
-
-
 export class SatelliteInfoComponent {
   selectedSatellite: string = '';
-  manualSatellite: string = ''; // Nuevo input para el nombre del satélite manual
+  manualSatellite: string = '';
 
   satelliteInfo: string = '';
-  satelliteName: string = ''; 
-  satelliteJson: any = ''; 
+  satelliteName: string = '';
+  satelliteJson: any = '';
 
   constructor(private http: HttpClient, private satelliteService: SatelliteCalculationService) {}
 
   async getSatelliteInfo() {
-    let selected = this.selectedSatellite; // Usamos la selección normalmente
+     let selected = this.selectedSatellite;
 
-    // Si hay un valor manual, lo utilizamos en lugar de la selección
     if (this.manualSatellite && this.manualSatellite.trim() !== '') {
       selected = this.manualSatellite.trim();
     }
@@ -64,4 +61,13 @@ export class SatelliteInfoComponent {
       console.error('Hubo un error al obtener la información del satélite:', error);
     }
   }
+
+onSatelliteSelect(event: any) {
+  this.manualSatellite = ''; 
+  this.getSatelliteInfo(); 
+}
+onManualSatelliteInput() {
+  this.selectedSatellite = '';
+}
+
 }

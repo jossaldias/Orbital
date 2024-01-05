@@ -174,8 +174,8 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
     switch (this.satelliteJson.OBJECT_NAME) {
       case 'SSOT':
         el.style.backgroundImage = 'url(\'../../assets/img/fasat.png\')';
-        el.style.width = '150px';
-        el.style.height = '150px';
+        el.style.width = '50px';
+        el.style.height = '50px';
         break;
       case 'ISS (ZARYA)':
         el.style.backgroundImage = 'url(\'../../assets/img/iss.png\')';

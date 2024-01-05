@@ -48,4 +48,12 @@ app-satellite-info {
     flex-direction: column; 
     align-items: center;
   }
+
+  app-satellite-info,
+  .fly-button {
+    flex: 1 1 auto; 
+    min-width: 55%;
+    max-width: 45%;
+
+  }
 }

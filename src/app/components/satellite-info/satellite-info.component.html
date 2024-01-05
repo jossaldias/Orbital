@@ -1,8 +1,7 @@
-<form class="get-satellite">
   <ng-container matFormField class="selector-satellite">
     <mat-form-field>
     <mat-label for="satelliteSelector">Seleccionar Satélite</mat-label>
-    <mat-select id="satelliteSelector" [(ngModel)]="selectedSatellite" (selectionChange)="getSatelliteInfo()">
+    <mat-select id="satelliteSelector" [(ngModel)]="selectedSatellite" (selectionChange)="onSatelliteSelect($event)">
       <mat-option value="SSOT">SSOT</mat-option>
       <mat-option value="EROS C3">EROS C3</mat-option>
       <mat-option value="EROS B">EROS B</mat-option>
@@ -12,8 +11,8 @@
   </ng-container>
   <ng-container matFormField class="input-satellite">
     <mat-form-field>
-    <input matInput placeholder="Ingresar Satélite Manualmente" [(ngModel)]="manualSatellite">
-    </mat-form-field>
-    <button mat-raised-button color="primary" (click)="getSatelliteInfo()">Buscar</button>
+  <input matInput placeholder="Ingresar Satélite Manualmente" [(ngModel)]="manualSatellite" (input)="onManualSatelliteInput()">
+</mat-form-field>
+<button mat-raised-button color="primary" (click)="getSatelliteInfo()">Buscar</button>
   </ng-container>
-</form>
+
