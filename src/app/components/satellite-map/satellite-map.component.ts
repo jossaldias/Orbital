@@ -19,33 +19,40 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
   marker: mapboxgl.Marker | undefined;
   satelliteCoordinates: SatelliteCoordinates | undefined;
   satelliteSubscription: Subscription | undefined;
+  satelliteArraySubscription: Subscription | undefined;
   mapInitialized = false;
   satelliteJson: any = '';
   coordinatesArray: any[] = [];
+
 
   constructor(private satelliteService: SatelliteCalculationService) { }
 
   ngOnInit() {
 
+    this.initializeMap();
+
     this.satelliteSubscription = this.satelliteService.coordinates$.subscribe(
       (coordinates: SatelliteCoordinates) => {
         this.satelliteCoordinates = coordinates;
-
-        const newCoordinates = [this.satelliteCoordinates.longitude, this.satelliteCoordinates.latitude];
-        this.coordinatesArray.push(newCoordinates);
-        this.drawSatellitePath(this.coordinatesArray);
-
         this.updateMarkerPosition();
         this.initializeMap();
       }
     );
 
     this.satelliteService.satelliteJson$.subscribe((json: any) => {
-      this.coordinatesArray.length = 0;
+      //this.coordinatesArray.length = 0;
       this.flyToSatellite()
       this.satelliteJson = json;
       if (this.mapInitialized) {
         this.addOrUpdateMarker();
+      }
+    });
+
+
+    this.satelliteArraySubscription = this.satelliteService.satelliteArray$.subscribe((coordinatesArray: any[]) => {
+      this.coordinatesArray = coordinatesArray;
+      if (this.mapInitialized) {
+        this.drawSatellitePath(coordinatesArray);
       }
     });
 
@@ -54,6 +61,9 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
   ngOnDestroy() {
     if (this.satelliteSubscription) {
       this.satelliteSubscription.unsubscribe();
+    }
+    if (this.satelliteArraySubscription) {
+      this.satelliteArraySubscription.unsubscribe();
     }
   }
 
@@ -72,7 +82,7 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
           if (this.satelliteCoordinates && !this.map) {
             this.map = new mapboxgl.Map({
               container: 'map',
-              //style: 'mapbox://styles/mapbox/streets-v9',
+              //style: 'mapbox://styles/mapbox/streets-v10',
               style: 'mapbox://styles/shiza1991/clqrjzve800ld01pd59dg9y7s',
               center: [-70.648, -33.456],
               zoom: 1
@@ -199,6 +209,12 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private generatePopupContent(): string {
     return `
+    <style>
+      table {
+        width: auto;
+        font-size: 8px; 
+      }
+    </style>
     <h6>${this.satelliteJson.OBJECT_NAME}</h6>  
         <table>
         <tr>
@@ -270,8 +286,8 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
-  drawSatellitePath(coordinates: any[]) {
-    if (!this.map || !coordinates || coordinates.length < 2) {
+  drawSatellitePath(coordinatesArray: any[]) {
+    if (!this.map || !coordinatesArray || coordinatesArray.length < 2) {
       return;
     }
 
@@ -283,11 +299,10 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
           properties: {},
           geometry: {
             type: 'LineString',
-            coordinates: coordinates
+            coordinates: coordinatesArray
           }
         }
       });
-
 
       this.map.addLayer({
         id: 'satellitePath',
@@ -304,8 +319,7 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
         }
       });
 
-
-
+      this.mapInitialized = true; // Actualiza mapInitialized cuando se dibuja la ruta del satélite
     } else {
       const satellitePathSource = this.map.getSource('satellitePath');
       if (satellitePathSource) {
@@ -314,12 +328,13 @@ export class SatelliteMapComponent implements OnInit, OnDestroy, AfterViewInit {
           properties: {},
           geometry: {
             type: 'LineString',
-            coordinates: coordinates
+            coordinates: coordinatesArray
           }
         });
       }
     }
   }
+
 
 }
 

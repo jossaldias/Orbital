@@ -2,3 +2,19 @@
   color: #999;
   font-size: 13px;
 }
+
+mat-option{
+  font-size: 13px;
+}
+
+mat-label{
+  font-size: 13px;
+}
+
+selector-satellite{
+font-size: 13px;
+}
+
+/* mat-form-field {
+margin: 15px;
+} */
